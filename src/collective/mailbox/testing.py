@@ -6,6 +6,8 @@ from plone.app.testing import applyProfile
 
 from zope.configuration import xmlconfig
 
+import Products.PrintingMailHost
+
 class CollectiveMailbox(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE, )
