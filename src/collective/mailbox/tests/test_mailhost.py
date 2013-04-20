@@ -25,4 +25,4 @@ class TestExample(unittest.TestCase):
         self.assertTrue(pid in installed,
                         'package appears not to have been installed')
         # Make sure the mailbox got installed.
-        self.assertTrue(isinstance(self.portal.MailHost), MailBoxHost)
+        self.assertTrue(isinstance(self.portal.MailHost, MailBoxHost))

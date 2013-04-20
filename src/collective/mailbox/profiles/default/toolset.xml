@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<tool-setup>
+ <required tool_id="MailHost" class="collective.mailbox.mailhost.MailBoxHost"/>
+</tool-setup>
