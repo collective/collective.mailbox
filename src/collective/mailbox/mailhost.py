@@ -1,4 +1,5 @@
 from rfc822 import Message
+from DateTime import DateTime
 from cStringIO import StringIO
 from Products.MailHost.MailHost import MailHost
 from AccessControl.SecurityInfo import ClassSecurityInfo
@@ -7,6 +8,8 @@ from Products.CMFCore.utils import getToolByName
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree
 from BTrees.IIBTree import IITreeSet
+
+from plone.api import user
 
 try:
     from Products.PrintingMailHost.Patch import PrintingMailHost
@@ -46,6 +49,7 @@ class MailBoxHost(MailHost):
         message = Message(StringIO(messageText))
         email = {'from': mfrom,
                  'to': mto,
+                 'date': DateTime(), # DateTime beacause timezones.
                  'subject': message.getheader('subject'),
                  'message': messageText[message.startofbody:]}
 
@@ -77,3 +81,17 @@ class MailBoxHost(MailHost):
         if store:
             self._emails[key] = email
             
+    security.declarePublic('my_mails')
+    def my_mails(self):
+        """Return a dictionary of emails"""
+
+        user_id = user.get_current().getId()
+        if user_id in self._inboxes:
+            inbox = [self._emails[key] for key in self._inboxes[user_id]]
+        else:
+            inbox = []
+        if user_id in self._outboxes:
+            outbox = [self._emails[key] for key in self._outboxes[user_id]]
+        else:
+            outbox = []
+        return {'inbox': inbox, 'outbox': outbox}

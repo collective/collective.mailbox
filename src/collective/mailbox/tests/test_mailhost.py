@@ -1,5 +1,6 @@
 import unittest2 as unittest
 from plone.api import user
+from plone.app.testing import login
 
 from Products.CMFCore.utils import getToolByName
 
@@ -31,7 +32,7 @@ class TestExample(unittest.TestCase):
         # Make sure the mailbox got installed.
         self.assertTrue(isinstance(self.portal.MailHost, MailBoxHost))
         
-    def test_mail(self):
+    def test_mailhost(self):
         # Send a mail
         mh = self.portal.MailHost
         mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
@@ -58,3 +59,17 @@ class TestExample(unittest.TestCase):
         mh.simple_send('notauser@foo.bar', 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 4)
         
+        # You can retrieve your own emails, based on user_id:
+        
+        my_mails = mh.my_mails()
+        self.assertEqual(my_mails, {'inbox': [], 'outbox': []})
+        
+        login(self.portal, 'fromer')
+        my_mails = mh.my_mails()
+        self.assertEqual(len(my_mails['inbox']), 0)
+        self.assertEqual(len(my_mails['outbox']), 3)
+
+        login(self.portal, 'toer')
+        my_mails = mh.my_mails()
+        self.assertEqual(len(my_mails['inbox']), 3)
+        self.assertEqual(len(my_mails['outbox']), 0)
