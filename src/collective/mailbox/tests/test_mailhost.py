@@ -37,7 +37,7 @@ class TestMailHost(unittest.TestCase):
         
     def test_mailhost(self):
         # Send a mail
-        mh = self.portal.MailHost
+        mh = getToolByName(self.portal, 'MailHost')
         mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 1)
 
@@ -90,13 +90,14 @@ class TestViews(unittest.TestCase):
         user.create('toer@foo.bar', 'toer', 'secret')
         user.create('toer2@foo.bar', 'toer2', 'secret')
     
-        mh = self.portal.MailHost
+        mh = getToolByName(self.portal, 'MailHost')
         mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject 1', 'This is a mail body.\n')
         mh.simple_send('toer@foo.bar,toer2@foo.bar', 'fromer@foo.bar', 'Test subject 2', 'The body\nof the mail.\n')
         transaction.commit()
         
     def test_outbox(self):
         browser = Browser(self.app)
+        browser.handleErrors = False
         browser.addHeader('Authorization', 'Basic %s:%s' % ('fromer', 'secret',))
 
         portalURL = self.portal.absolute_url()
@@ -104,4 +105,19 @@ class TestViews(unittest.TestCase):
         self.assertIn('fromer', browser.contents)
         
         browser.open(portalURL+'/@@my_mailbox')
-                
+
+        self.assertIn('toer@foo.bar', browser.contents)
+        self.assertIn('toer2@foo.bar', browser.contents)
+        self.assertIn('Test subject 1', browser.contents)
+        self.assertIn('This is a mail body.\n', browser.contents)
+        self.assertIn('Test subject 2', browser.contents)        
+        self.assertIn('The body\nof the mail.\n', browser.contents)
+        
+        self.assertNotIn('fromer@foo.bar', browser.contents)
+
+        browser = Browser(self.app)
+        browser.handleErrors = False
+        browser.addHeader('Authorization', 'Basic %s:%s' % ('toer', 'secret',))
+        browser.open(portalURL+'/@@my_mailbox')
+        self.assertIn('fromer@foo.bar', browser.contents)
+        

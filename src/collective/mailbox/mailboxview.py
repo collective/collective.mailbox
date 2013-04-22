@@ -10,13 +10,13 @@ class MailboxView(BrowserView):
         self.request = request
         
     def supports_mailbox(self):
-        acl_users = getToolByName(self.context, 'acl_users')
-        return hasattr(acl_users, 'my_emails')
+        mailhost = getToolByName(self.context, 'MailHost')
+        return hasattr(mailhost, 'my_mails')
         
     def get_mails(self):
-        acl_users = getToolByName(self.context, 'acl_users')
+        mailhost = getToolByName(self.context, 'MailHost')
         try:
-            return acl_users.my_mails()
+            return mailhost.my_mails()
         except AttributeError:
             return {'outbox': [], 'inbox': []}
         

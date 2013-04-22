@@ -6,17 +6,49 @@
   <div metal:fill-slot="content-core">
     <tal:main-macro metal:define-macro="content-core">
     
-      <div condition="not: view/supports_mailbox">
+      <div tal:condition="not: view/supports_mailbox">
         This system is not set up to support mailboxes
       </div>
       
-      <div condition="view/supports_mailbox">
+      <div tal:condition="view/supports_mailbox">
+        <tal:block tal:define="mails view/get_mails">
       
-        <div class="cmb-inbox">
-        </div>
-
-        <div class="cmb-outbox">
-        </div>
+          <div class="cmb-inbox">
+            <h3>Inbox</h3>
+            <table>
+              <tal:block repeat="mail mails/inbox" >
+                <tr>
+                  <td><strong>From:</strong></td><td><span tal:content="mail/from">sender</span></td>
+                  <td><strong>Date:</strong></td><td><span tal:content="mail/date">date</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Subject:</strong></td><td colspan="3"><span tal:content="mail/subject">subject</span></td>
+                </tr>
+                <tr>
+                  <td colspan="4" tal:content="mail/message"></td>
+                </tr>
+              </tal:block>
+            </table>
+          </div>
+  
+          <div class="cmb-outbox">
+            <h3>Outbox</h3>
+            <table>
+              <tal:block repeat="mail mails/outbox" >
+                <tr>
+                  <td><strong>To:</strong></td><td><span tal:content="mail/to">recipient</span></td>
+                  <td><strong>Date:</strong></td><td><span tal:content="mail/date">date</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Subject:</strong></td><td colspan="3"><span tal:content="mail/subject">subject</span></td>
+                </tr>
+                <tr>
+                  <td colspan="4" tal:content="mail/message"></td>
+                </tr>
+              </tal:block>
+            </table>
+          </div>
+        </tal:block>
         
       </div>
 
