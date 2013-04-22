@@ -37,33 +37,35 @@ class TestMailHost(unittest.TestCase):
         
     def test_mailhost(self):
         # Send a mail
+        login(self.portal, 'fromer')
         mh = getToolByName(self.portal, 'MailHost')
-        mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
+        mh.simple_send(['toer@foo.bar'], 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 1)
 
         # Multiple recipients
-        mh.simple_send('toer@foo.bar,toer2@foo.bar', 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
+        mh.simple_send(['toer@foo.bar','toer2@foo.bar'], 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 2)
         self.assertEqual(len(mh._outboxes['fromer']), 2)
         self.assertEqual(len(mh._inboxes['toer']), 2)
         self.assertEqual(len(mh._inboxes['toer2']), 1)
         
         # Non-user recipients doesn't increase inbox count.
-        mh.simple_send('notauser@foo.bar', 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
+        mh.simple_send(['notauser@foo.bar'], 'fromer@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 3)
         self.assertEqual(len(mh._inboxes), 2)
         
         # Sending from a non-user doesn't increase outbox count.
-        mh.simple_send('toer@foo.bar', 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
+        mh.simple_send(['toer@foo.bar'], 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 4)
         self.assertEqual(len(mh._outboxes), 1)
 
         # When noone is a users, it doesn't even get stored,
-        mh.simple_send('notauser@foo.bar', 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
+        mh.simple_send(['notauser@foo.bar'], 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
         self.assertEqual(len(mh._emails), 4)
         
         # You can retrieve your own emails, based on user_id:
         
+        login(self.portal, 'test_user_1_')
         my_mails = mh.my_mails()
         self.assertEqual(my_mails, {'inbox': [], 'outbox': []})
         

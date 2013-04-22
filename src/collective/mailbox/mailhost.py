@@ -47,8 +47,15 @@ class MailBoxHost(MailHost):
         # sent, mail shoud be delivered directly, always.
         MailHost._send(self, mfrom, mto, messageText, immediate=True)
         message = Message(StringIO(messageText))
+        # I'm not sure you always get list here, so I handle both:
+        if isinstance(mto, (str, unicode)):
+            recipients = mto
+            mto = mto.split(',')
+        else:
+            recipients = ','.join(mto)
+
         email = {'from': mfrom,
-                 'to': mto,
+                 'to': recipients,
                  'date': DateTime(), # DateTime beacause timezones.
                  'subject': message.getheader('subject'),
                  'message': messageText[message.startofbody:]}
@@ -59,17 +66,18 @@ class MailBoxHost(MailHost):
             key = 0
         
         store = False
-        acl_users = getToolByName(self, 'acl_users')
-        sender = acl_users.searchUsers(email=mfrom)
-        if sender:
-            sender_id = sender[0]['userid']
+        current_user = user.get_current()
+        if mfrom == current_user.getProperty('email'):
+            # Only store if this is an email from the current user, and not a system email.
+            sender_id = current_user.getId()
             if sender_id not in self._outboxes:
                 self._outboxes[sender_id] = IITreeSet()
             self._outboxes[sender_id].add(key)
             store = True
         
+        acl_users = getToolByName(self, 'acl_users')
         recipients = []
-        for mail in mto.split(','):
+        for mail in mto:
             recipients.extend(acl_users.searchUsers(email=mail.strip()))
         for recipient in recipients:
             recipient_id = recipient['userid']
