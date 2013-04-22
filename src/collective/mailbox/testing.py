@@ -27,3 +27,7 @@ COLLECTIVE_MAILBOX_FIXTURE = CollectiveMailbox()
 COLLECTIVE_MAILBOX_INTEGRATION_TESTING = \
     IntegrationTesting(bases=(COLLECTIVE_MAILBOX_FIXTURE, ),
                        name="CollectiveMailbox:Integration")
+
+COLLECTIVE_MAILBOX_FUNCTIONAL_TESTING = \
+    FunctionalTesting(bases=(COLLECTIVE_MAILBOX_FIXTURE, ),
+                       name="CollectiveMailbox:Functional")

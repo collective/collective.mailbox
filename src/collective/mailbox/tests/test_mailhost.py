@@ -1,3 +1,4 @@
+import transaction
 import unittest2 as unittest
 from plone.api import user
 from plone.app.testing import login
@@ -5,11 +6,13 @@ from plone.app.testing import login
 from Products.CMFCore.utils import getToolByName
 
 from collective.mailbox.testing import\
-    COLLECTIVE_MAILBOX_INTEGRATION_TESTING
+    COLLECTIVE_MAILBOX_INTEGRATION_TESTING, COLLECTIVE_MAILBOX_FUNCTIONAL_TESTING
+
+from plone.testing.z2 import Browser
 
 from collective.mailbox.mailhost import MailBoxHost
 
-class TestExample(unittest.TestCase):
+class TestMailHost(unittest.TestCase):
 
     layer = COLLECTIVE_MAILBOX_INTEGRATION_TESTING
     
@@ -73,3 +76,32 @@ class TestExample(unittest.TestCase):
         my_mails = mh.my_mails()
         self.assertEqual(len(my_mails['inbox']), 3)
         self.assertEqual(len(my_mails['outbox']), 0)
+
+
+class TestViews(unittest.TestCase):
+
+    layer = COLLECTIVE_MAILBOX_FUNCTIONAL_TESTING
+    
+    def setUp(self):
+        self.app = self.layer['app']
+        self.portal = self.layer['portal']
+        self.qi_tool = getToolByName(self.portal, 'portal_quickinstaller')
+        user.create('fromer@foo.bar', 'fromer', 'secret')
+        user.create('toer@foo.bar', 'toer', 'secret')
+        user.create('toer2@foo.bar', 'toer2', 'secret')
+    
+        mh = self.portal.MailHost
+        mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject 1', 'This is a mail body.\n')
+        mh.simple_send('toer@foo.bar,toer2@foo.bar', 'fromer@foo.bar', 'Test subject 2', 'The body\nof the mail.\n')
+        transaction.commit()
+        
+    def test_outbox(self):
+        browser = Browser(self.app)
+        browser.addHeader('Authorization', 'Basic %s:%s' % ('fromer', 'secret',))
+
+        portalURL = self.portal.absolute_url()
+        browser.open(portalURL)
+        self.assertIn('fromer', browser.contents)
+        
+        browser.open(portalURL+'/@@my_mailbox')
+                

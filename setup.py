@@ -16,7 +16,7 @@ long_description = (
 
 setup(name='collective.mailbox',
       version=version,
-      description="A MailHost that stores outgoing mail in a mailbox.",
+      description="A MailHost that stores outgoing mail.",
       long_description=long_description,
       # Get more strings from
       # http://pypi.python.org/pypi?%3Aaction=list_classifiers

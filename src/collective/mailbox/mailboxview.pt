@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="opm.cld.content">
+<body>
+  <div metal:fill-slot="content-core">
+    <tal:main-macro metal:define-macro="content-core">
+    
+      <div condition="not: view/supports_mailbox">
+        This system is not set up to support mailboxes
+      </div>
+      
+      <div condition="view/supports_mailbox">
+      
+        <div class="cmb-inbox">
+        </div>
+
+        <div class="cmb-outbox">
+        </div>
+        
+      </div>
+
+    </tal:main-macro>
+  </div>
+</body>
+</html>

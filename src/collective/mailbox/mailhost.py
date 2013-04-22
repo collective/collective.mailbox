@@ -95,3 +95,5 @@ class MailBoxHost(MailHost):
         else:
             outbox = []
         return {'inbox': inbox, 'outbox': outbox}
+    
+    
