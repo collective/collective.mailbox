@@ -1,7 +1,7 @@
 import transaction
 import unittest2 as unittest
 from plone.api import user
-from plone.app.testing import login
+from plone.app.testing import login, TEST_USER_NAME
 
 from Products.CMFCore.utils import getToolByName
 
@@ -65,7 +65,7 @@ class TestMailHost(unittest.TestCase):
         
         # You can retrieve your own emails, based on user_id:
         
-        login(self.portal, 'test_user_1_')
+        login(self.portal, TEST_USER_NAME)
         my_mails = mh.my_mails()
         self.assertEqual(my_mails, {'inbox': [], 'outbox': []})
         
@@ -92,6 +92,7 @@ class TestViews(unittest.TestCase):
         user.create('toer@foo.bar', 'toer', 'secret')
         user.create('toer2@foo.bar', 'toer2', 'secret')
     
+        login(self.portal, 'fromer')
         mh = getToolByName(self.portal, 'MailHost')
         mh.simple_send('toer@foo.bar', 'fromer@foo.bar', 'Test subject 1', 'This is a mail body.\n')
         mh.simple_send('toer@foo.bar,toer2@foo.bar', 'fromer@foo.bar', 'Test subject 2', 'The body\nof the mail.\n')
@@ -111,9 +112,9 @@ class TestViews(unittest.TestCase):
         self.assertIn('toer@foo.bar', browser.contents)
         self.assertIn('toer2@foo.bar', browser.contents)
         self.assertIn('Test subject 1', browser.contents)
-        self.assertIn('This is a mail body.\n', browser.contents)
+        self.assertIn('This is a mail body.', browser.contents)
         self.assertIn('Test subject 2', browser.contents)        
-        self.assertIn('The body\nof the mail.\n', browser.contents)
+        self.assertIn('The body\nof the mail.', browser.contents)
         
         self.assertNotIn('fromer@foo.bar', browser.contents)
 

@@ -44,7 +44,7 @@
             <table>
               <tal:block repeat="mail mails/outbox" >
                 <tr>
-                  <th>From:</th><td><span tal:content="mail/from">sender</span></td>
+                  <th>To:</th><td><span tal:content="mail/to">recipient</span></td>
                   <th>Date:</th><td><span tal:content="python:mail['date'].strftime('%x %X')">date</span></td>
                 </tr>
                 <tr>
