@@ -1,0 +1,8 @@
+include *.py
+include *.txt
+include buildout.cfg
+include docs/LICENSE.GPL
+recursive-include docs *.txt
+recursive-include src *.pt
+recursive-include src *.xml
+recursive-include src *.zcml
