@@ -10,23 +10,31 @@
         This system is not set up to support mailboxes
       </div>
       
+      <style type="text/css">
+        th {
+          width: 5em;
+        }
+      
+      </style>
+      
       <div tal:condition="view/supports_mailbox">
-        <tal:block tal:define="mails view/get_mails">
+        <tal:block tal:define="mails view/get_mails;">
       
           <div class="cmb-inbox">
             <h3>Inbox</h3>
             <table>
               <tal:block repeat="mail mails/inbox" >
                 <tr>
-                  <td><strong>From:</strong></td><td><span tal:content="mail/from">sender</span></td>
-                  <td><strong>Date:</strong></td><td><span tal:content="mail/date">date</span></td>
+                  <th>From:</th><td><span tal:content="mail/from">sender</span></td>
+                  <th>Date:</th><td><span tal:content="python:mail['date'].strftime('%x %X')">date</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Subject:</strong></td><td colspan="3"><span tal:content="mail/subject">subject</span></td>
+                  <th>Subject:</th><td colspan="3"><span tal:content="mail/subject">subject</span></td>
                 </tr>
                 <tr>
-                  <td colspan="4" tal:content="mail/message"></td>
+                  <td colspan="4"><pre tal:content="python:view.format_body(mail['message'])"></pre></td>
                 </tr>
+                <tr><td colspan="4"><hr/></td></tr>
               </tal:block>
             </table>
           </div>
@@ -36,15 +44,16 @@
             <table>
               <tal:block repeat="mail mails/outbox" >
                 <tr>
-                  <td><strong>To:</strong></td><td><span tal:content="mail/to">recipient</span></td>
-                  <td><strong>Date:</strong></td><td><span tal:content="mail/date">date</span></td>
+                  <th>From:</th><td><span tal:content="mail/from">sender</span></td>
+                  <th>Date:</th><td><span tal:content="python:mail['date'].strftime('%x %X')">date</span></td>
                 </tr>
                 <tr>
-                  <td><strong>Subject:</strong></td><td colspan="3"><span tal:content="mail/subject">subject</span></td>
+                  <th>Subject:</th><td colspan="3"><span tal:content="mail/subject">subject</span></td>
                 </tr>
                 <tr>
-                  <td colspan="4" tal:content="mail/message"></td>
+                  <td colspan="4"><pre tal:content="python:view.format_body(mail['message'])"></pre></td>
                 </tr>
+                <tr><td colspan="4"><hr/></td></tr>
               </tal:block>
             </table>
           </div>

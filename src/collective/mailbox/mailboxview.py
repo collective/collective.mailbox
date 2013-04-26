@@ -20,3 +20,6 @@ class MailboxView(BrowserView):
         except AttributeError:
             return {'outbox': [], 'inbox': []}
         
+    def format_body(self, mailbody):
+        mailbody = mailbody.replace('=\n', '')
+        return mailbody.strip()

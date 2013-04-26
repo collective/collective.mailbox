@@ -1,4 +1,7 @@
-from rfc822 import Message
+from email.header import decode_header
+from email import message_from_string
+from email.mime.text import MIMEText
+
 from DateTime import DateTime
 from cStringIO import StringIO
 from Products.MailHost.MailHost import MailHost
@@ -15,6 +18,14 @@ try:
     from Products.PrintingMailHost.Patch import PrintingMailHost
 except ImportError:
     PrintingMailHost = None
+
+def getheader(header_text, default="ascii"):
+    """Decode the specified header"""
+    
+    headers = decode_header(header_text)
+    header_sections = [unicode(text, charset or default)
+    for text, charset in headers]
+    return u"".join(header_sections) 
 
 class MailBoxHost(MailHost):
 
@@ -46,7 +57,6 @@ class MailBoxHost(MailHost):
         # Send it immediately. We don't want to store mails that doesn't get
         # sent, mail shoud be delivered directly, always.
         MailHost._send(self, mfrom, mto, messageText, immediate=True)
-        message = Message(StringIO(messageText))
         # I'm not sure you always get list here, so I handle both:
         if isinstance(mto, (str, unicode)):
             recipients = mto
@@ -54,11 +64,12 @@ class MailBoxHost(MailHost):
         else:
             recipients = ','.join(mto)
 
+        message = message_from_string(messageText)
         email = {'from': mfrom,
                  'to': recipients,
                  'date': DateTime(), # DateTime beacause timezones.
-                 'subject': message.getheader('subject'),
-                 'message': messageText[message.startofbody:]}
+                 'subject': getheader(message['subject']),
+                 'message': message.get_payload()}
 
         try:
             key = self._emails.maxKey() + 1
