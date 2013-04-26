@@ -23,6 +23,7 @@ setup(name='collective.mailbox',
       classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.7",
+        "Framework :: Plone :: 4.2",
         ],
       keywords='mail plone',
       author='Lennart Regebro',
