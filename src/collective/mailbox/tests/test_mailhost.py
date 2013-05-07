@@ -1,7 +1,7 @@
 import transaction
 import unittest2 as unittest
 from plone.api import user
-from plone.app.testing import login, TEST_USER_NAME
+from plone.app.testing import login, logout, TEST_USER_NAME, SITE_OWNER_NAME
 
 from Products.CMFCore.utils import getToolByName
 
@@ -54,17 +54,21 @@ class TestMailHost(unittest.TestCase):
         self.assertEqual(len(mh._emails), 3)
         self.assertEqual(len(mh._inboxes), 2)
         
-        # Sending from a non-user doesn't increase outbox count.
+        # Sending from a non-user doesn't store the email (because it's probably a password reminder).
+        logout()
         mh.simple_send(['toer@foo.bar'], 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
-        self.assertEqual(len(mh._emails), 4)
+        self.assertEqual(len(mh._emails), 3)
+        self.assertEqual(len(mh._inboxes), 2)
         self.assertEqual(len(mh._outboxes), 1)
 
-        # When noone is a users, it doesn't even get stored,
+        # Sending from the site owner also doesn't store it.
+        login(self.app, SITE_OWNER_NAME)
         mh.simple_send(['notauser@foo.bar'], 'someoneelse@foo.bar', 'Test subject', 'The body\nof the mail.\n')
-        self.assertEqual(len(mh._emails), 4)
+        self.assertEqual(len(mh._emails), 3)
+        self.assertEqual(len(mh._inboxes), 2)
+        self.assertEqual(len(mh._outboxes), 1)
         
-        # You can retrieve your own emails, based on user_id:
-        
+        # You can retrieve your own emails, based on user_id:s        
         login(self.portal, TEST_USER_NAME)
         my_mails = mh.my_mails()
         self.assertEqual(my_mails, {'inbox': [], 'outbox': []})
@@ -76,7 +80,7 @@ class TestMailHost(unittest.TestCase):
 
         login(self.portal, 'toer')
         my_mails = mh.my_mails()
-        self.assertEqual(len(my_mails['inbox']), 3)
+        self.assertEqual(len(my_mails['inbox']), 2)
         self.assertEqual(len(my_mails['outbox']), 0)
 
 

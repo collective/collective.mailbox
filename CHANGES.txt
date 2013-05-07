@@ -4,7 +4,7 @@ Changelog
 1.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Changed the logic in what got stored.
 
 
 1.0.1 (2013-04-26)

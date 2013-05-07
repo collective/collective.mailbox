@@ -78,13 +78,17 @@ class MailBoxHost(MailHost):
         
         store = False
         current_user = user.get_current()
-        if mfrom == current_user.getProperty('email'):
-            # Only store if this is an email from the current user, and not a system email.
-            sender_id = current_user.getId()
-            if sender_id not in self._outboxes:
-                self._outboxes[sender_id] = IITreeSet()
-            self._outboxes[sender_id].add(key)
-            store = True
+        current_email = current_user.getProperty('email')
+        
+        # Don't store anonymous password resets, or emails from the admin
+        if current_user.getId() is None or current_email is None or current_email == self.email_from_address:
+            return
+        
+        sender_id = current_user.getId()
+        if sender_id not in self._outboxes:
+            self._outboxes[sender_id] = IITreeSet()
+        self._outboxes[sender_id].add(key)
+        store = True
         
         acl_users = getToolByName(self, 'acl_users')
         recipients = []
