@@ -4,7 +4,7 @@ Changelog
 1.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Put latest mails on top.
 
 
 1.1 (2013-05-07)

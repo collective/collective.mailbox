@@ -110,11 +110,11 @@ class MailBoxHost(MailHost):
 
         user_id = user.get_current().getId()
         if user_id in self._inboxes:
-            inbox = [self._emails[key] for key in self._inboxes[user_id]]
+            inbox = reversed([self._emails[key] for key in self._inboxes[user_id]])
         else:
             inbox = []
         if user_id in self._outboxes:
-            outbox = [self._emails[key] for key in self._outboxes[user_id]]
+            outbox = reversed([self._emails[key] for key in self._outboxes[user_id]])
         else:
             outbox = []
         return {'inbox': inbox, 'outbox': outbox}
