@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1.2 (unreleased)
+1.1.2 (2013-06-06)
 ------------------
 
 - Change the action to "Message history" to be clearer about that it's not a
